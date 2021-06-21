@@ -40,7 +40,7 @@ class CalendarHelper {
         }
         return numberDays
     }
-    // MARK: Get total day in a month.
+    // MARK: Get Date(MM, dd, YYYY).
     static func getThatDate(_ days: [ModelDate], _ months: [ModelDate], _ years: [ModelDate]) -> Date {
         var currentDay: String = ""
         var currentMonth: String = ""
@@ -60,7 +60,10 @@ class CalendarHelper {
         let dateFormatter = DateFormatter()
         dateFormatter.dateFormat = "MM/dd/yyyy"
         let date = dateFormatter.date(from: "\(currentMonth)/\(currentDay)/\(currentYear)")
-        return date!
+        guard let date = date else {
+            return Date()
+        }
+        return date
     }
 }
 

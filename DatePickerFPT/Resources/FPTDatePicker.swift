@@ -137,8 +137,8 @@ extension FPTDatePicker: UICollectionViewDelegate {
         delegate?.FPTDatePicker(didChange: date)
     }
     func selectMiddleRow(collectionView: UICollectionView, data: [ModelDate]) {
-        let Row = calculateMedian(array: collectionView.indexPathsForVisibleItems)
-        let selectedIndexPath = IndexPath(row: Int(Row), section: 0)
+        let row = calculateMedian(array: collectionView.indexPathsForVisibleItems)
+        let selectedIndexPath = IndexPath(row: Int(row), section: 0)
         for index in 0..<data.count {
             if index != selectedIndexPath.row {
                 data[index].isSelected = false
@@ -146,7 +146,7 @@ extension FPTDatePicker: UICollectionViewDelegate {
         }
         if let cell = collectionView.cellForItem(at: selectedIndexPath) as? DatePickerCollectionViewCell {
             cell.selectedCell(textColor: self.selectedTextColor)
-            data[Int(Row)].isSelected = true
+            data[Int(row)].isSelected = true
             if collectionView.tag != 0 {
                 compareDays()
             }
