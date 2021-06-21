@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<document type="com.apple.InterfaceBuilder3.CocoaTouch.XIB" version="3.0" toolsVersion="18122" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" useSafeAreas="YES" colorMatched="YES">
+    <device id="retina4_7" orientation="portrait" appearance="light"/>
+    <dependencies>
+        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="18093"/>
+        <capability name="Safe area layout guides" minToolsVersion="9.0"/>
+        <capability name="documents saved in the Xcode 8 format" minToolsVersion="8.0"/>
+    </dependencies>
+    <objects>
+        <placeholder placeholderIdentifier="IBFilesOwner" id="-1" userLabel="File's Owner"/>
+        <placeholder placeholderIdentifier="IBFirstResponder" id="-2" customClass="UIResponder"/>
+        <collectionViewCell opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" reuseIdentifier="cell" id="gTV-IL-0wX" customClass="DatePickerCollectionViewCell" customModule="DatePickerFPT" customModuleProvider="target">
+            <rect key="frame" x="0.0" y="0.0" width="80" height="80"/>
+            <autoresizingMask key="autoresizingMask"/>
+            <view key="contentView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center">
+                <rect key="frame" x="0.0" y="0.0" width="80" height="80"/>
+                <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
+                <subviews>
+                    <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="MAR" textAlignment="center" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" minimumFontSize="10" translatesAutoresizingMaskIntoConstraints="NO" id="fn1-Zg-nJD">
+                        <rect key="frame" x="0.0" y="0.0" width="80" height="80"/>
+                        <fontDescription key="fontDescription" name="AvenirNext-Medium" family="Avenir Next" pointSize="18"/>
+                        <nil key="textColor"/>
+                        <nil key="highlightedColor"/>
+                    </label>
+                </subviews>
+            </view>
+            <viewLayoutGuide key="safeArea" id="ZTg-uK-7eu"/>
+            <constraints>
+                <constraint firstAttribute="bottom" secondItem="fn1-Zg-nJD" secondAttribute="bottom" id="28s-YJ-B28"/>
+                <constraint firstItem="fn1-Zg-nJD" firstAttribute="top" secondItem="gTV-IL-0wX" secondAttribute="top" id="IMA-h6-aNw"/>
+                <constraint firstItem="fn1-Zg-nJD" firstAttribute="leading" secondItem="gTV-IL-0wX" secondAttribute="leading" id="ZqC-RJ-Rfx"/>
+                <constraint firstItem="fn1-Zg-nJD" firstAttribute="centerX" secondItem="gTV-IL-0wX" secondAttribute="centerX" id="iuC-Gc-icq"/>
+                <constraint firstItem="fn1-Zg-nJD" firstAttribute="centerY" secondItem="gTV-IL-0wX" secondAttribute="centerY" id="ru8-16-9e6"/>
+                <constraint firstAttribute="trailing" secondItem="fn1-Zg-nJD" secondAttribute="trailing" id="udx-u9-Rfv"/>
+            </constraints>
+            <size key="customSize" width="127" height="122"/>
+            <connections>
+                <outlet property="labelDate" destination="fn1-Zg-nJD" id="Vng-5Y-Wx7"/>
+            </connections>
+            <point key="canvasLocation" x="-5.7971014492753632" y="-33.482142857142854"/>
+        </collectionViewCell>
+    </objects>
+</document>
