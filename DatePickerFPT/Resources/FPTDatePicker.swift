@@ -17,15 +17,15 @@ open class FPTDatePicker: UIView {
     @IBOutlet weak var yearRow: UICollectionView!
     @IBOutlet weak var calendarView: UIView!
     @IBOutlet weak var selectionView: UIView!
-    private var years = ModelDate.getYears() // Get Years
-    private let months = ModelDate.getMonths() // Get Month
+    private var years = ModelDate.getYears()
+    private let months = ModelDate.getMonths()
     private var currentDay = "31"
-    private var days: [ModelDate] = [] // Array days for a month
-    var infiniteScrollingBehaviourForYears: InfiniteScrollingBehaviour! // behaviour scroll year
-    var infiniteScrollingBehaviourForDays: InfiniteScrollingBehaviour! // behaviour scroll day
-    var infiniteScrollingBehaviourForMonths: InfiniteScrollingBehaviour! // behaviour scroll month
+    private var days: [ModelDate] = []
+    var infiniteScrollingBehaviourForYears: InfiniteScrollingBehaviour!
+    var infiniteScrollingBehaviourForDays: InfiniteScrollingBehaviour!
+    var infiniteScrollingBehaviourForMonths: InfiniteScrollingBehaviour!
     // Accessible Properties
-    public var bgColor: UIColor = #colorLiteral(red: 0.5564764738, green: 0.754239738, blue: 0.6585322022, alpha: 1) // background color
+    public var bgColor: UIColor =  #colorLiteral(red: 0.4745098054, green: 0.8392156959, blue: 0.9764705896, alpha: 1)
     public var selectedBgColor: UIColor = .white
     public var selectedTextColor: UIColor = .white
     public var deselectedBgColor: UIColor = .clear
@@ -44,13 +44,17 @@ open class FPTDatePicker: UIView {
         loadinit()
         registerCell()
     }
-    // MARK: Register Cell for CollectionViewCell Day Month Years.
-    private func registerCell() {
-        let bundle = Bundle(for: self.classForCoder)
-        let nibName = UINib(nibName: "DatePickerCollectionViewCell", bundle: bundle)
-        dateRow.register(nibName, forCellWithReuseIdentifier: "cell")
-        monthRow.register(nibName, forCellWithReuseIdentifier: "cell")
-        yearRow.register(nibName, forCellWithReuseIdentifier: "cell")
+    override open func willMove(toSuperview newSuperview: UIView?) {
+        super.willMove(toSuperview: newSuperview)
+        days = ModelDate.getDays(years, months)
+        
+        if let _ = infiniteScrollingBehaviourForDays {}
+        else {
+            let configuration = CollectionViewConfiguration(layoutType: .fixedSize(sizeValue: 60, lineSpacing: 10), scrollingDirection: .horizontal)
+            infiniteScrollingBehaviourForMonths = InfiniteScrollingBehaviour(withCollectionView: monthRow, andData: months, delegate: self, configuration: configuration)
+            infiniteScrollingBehaviourForDays = InfiniteScrollingBehaviour(withCollectionView: dateRow, andData: days, delegate: self, configuration: configuration)
+            infiniteScrollingBehaviourForYears = InfiniteScrollingBehaviour(withCollectionView: yearRow, andData: years, delegate: self, configuration: configuration)
+        }
     }
     private func loadinit() {
         let bundle = Bundle(for: self.classForCoder)
@@ -64,16 +68,6 @@ open class FPTDatePicker: UIView {
             self.calendarView.backgroundColor = self.bgColor
         }
     }
-    override open func willMove(toSuperview newSuperview: UIView?) {
-        super.willMove(toSuperview: newSuperview)
-        days = ModelDate.getDays(years, months)
-        let configuration = CollectionViewConfiguration(layoutType: .fixedSize(sizeValue: 60, lineSpacing: 10), scrollingDirection: .horizontal)
-        infiniteScrollingBehaviourForYears = InfiniteScrollingBehaviour(withCollectionView: yearRow, andData: years, delegate: self, configuration: configuration)
-        infiniteScrollingBehaviourForMonths = InfiniteScrollingBehaviour(withCollectionView: monthRow, andData: months, delegate: self, configuration: configuration)
-        infiniteScrollingBehaviourForDays = InfiniteScrollingBehaviour(withCollectionView: dateRow, andData: days, delegate: self, configuration: configuration)
-    }
-   
-    // MARK: initial Date.
     func initialDate(date: Date) {
         let (mm, dd, yyyy) = date.seprateDateInDDMMYY
         let year = years.firstIndex { (modelObj) -> Bool in
@@ -116,6 +110,13 @@ open class FPTDatePicker: UIView {
         }
         collectionView.scroll(toElementAtIndex: index)
     }
+    private func registerCell() {
+        let bundle = Bundle(for: self.classForCoder)
+        let nibName = UINib(nibName: "DatePickerCollectionViewCell", bundle: bundle)
+        dateRow.register(nibName, forCellWithReuseIdentifier: "cell")
+        monthRow.register(nibName, forCellWithReuseIdentifier: "cell")
+        yearRow.register(nibName, forCellWithReuseIdentifier: "cell")
+    }
 }
 
 extension FPTDatePicker: UICollectionViewDelegate {
@@ -136,14 +137,16 @@ extension FPTDatePicker: UICollectionViewDelegate {
         delegate?.FPTDatePicker(didChange: date)
     }
     func selectMiddleRow(collectionView: UICollectionView, data: [ModelDate]) {
-        let row = calculateMedian(array: collectionView.indexPathsForVisibleItems)
-        let selectedIndexPath = IndexPath(row: Int(row), section: 0)
-        for index in 0..<data.count where index != selectedIndexPath.row {
-            data[index].isSelected = false
+        let Row = calculateMedian(array: collectionView.indexPathsForVisibleItems)
+        let selectedIndexPath = IndexPath(row: Int(Row), section: 0)
+        for index in 0..<data.count {
+            if index != selectedIndexPath.row {
+                data[index].isSelected = false
+            }
         }
         if let cell = collectionView.cellForItem(at: selectedIndexPath) as? DatePickerCollectionViewCell {
             cell.selectedCell(textColor: self.selectedTextColor)
-            data[Int(row)].isSelected = true
+            data[Int(Row)].isSelected = true
             if collectionView.tag != 0 {
                 compareDays()
             }
@@ -161,7 +164,8 @@ extension FPTDatePicker {
             newDays.selectDay(selectedDay: selectedDay)
         }
         days = newDays
-        if Int(currentDay)! > days.count {
+        infiniteScrollingBehaviourForDays.reload(withData: days)
+        if Int(currentDay)! > days.count{
             let index = days.count - 1
             days[index].isSelected = true
             currentDay = "\(days.count)"
@@ -170,17 +174,12 @@ extension FPTDatePicker {
 }
 
 extension FPTDatePicker: InfiniteScrollingBehaviourDelegate {
-    
-    public func configuredCell(collectionView: UICollectionView,
-                               forItemAtIndexPath indexPath: IndexPath, originalIndex: Int,
-                               andData data: InfiniteScollingData,
-                               forInfiniteScrollingBehaviour behaviour: InfiniteScrollingBehaviour) -> UICollectionViewCell {
+    public func configuredCell(collectionView: UICollectionView, forItemAtIndexPath indexPath: IndexPath, originalIndex: Int, andData data: InfiniteScollingData, forInfiniteScrollingBehaviour behaviour: InfiniteScrollingBehaviour) -> UICollectionViewCell {
         let cell = behaviour.collectionView.dequeueReusableCell(withReuseIdentifier: "cell", for: indexPath) as! DatePickerCollectionViewCell
         cell.labelDate.font = fontFamily
         switch behaviour.collectionView.tag {
         case 0:
             if let day = data as? ModelDate {
-                //print(day)
                 if day.isSelected {
                     cell.selectedCell(textColor: selectedTextColor)
                 } else {
@@ -211,30 +210,34 @@ extension FPTDatePicker: InfiniteScrollingBehaviourDelegate {
         }
         return cell
     }
-    public func didSelectItem(collectionView: UICollectionView, atIndexPath indexPath: IndexPath,
-                              originalIndex: Int, andData data: InfiniteScollingData,
-                              inInfiniteScrollingBehaviour behaviour: InfiniteScrollingBehaviour) {
+    public func didSelectItem(collectionView: UICollectionView,atIndexPath indexPath: IndexPath, originalIndex: Int, andData data: InfiniteScollingData, inInfiniteScrollingBehaviour behaviour: InfiniteScrollingBehaviour) {
         if let cell = behaviour.collectionView.cellForItem(at: indexPath) as? DatePickerCollectionViewCell {
             cell.labelDate.font = fontFamily
             if behaviour.collectionView.tag == 0 {
-                for index in 0..<days.count where index != originalIndex {
-                    currentDay = days[index].type
-                    days[index].isSelected = false
+                for i in 0..<days.count {
+                    if i != originalIndex {
+                        currentDay = days[i].type
+                        days[i].isSelected = false
+                    }
                 }
                 days[originalIndex].isSelected = true
                 compareDays()
                 cell.selectedCell(textColor: selectedTextColor)
             } else if behaviour.collectionView.tag == 1 {
-                for index in 0..<months.count where index != originalIndex {
-                    months[index].isSelected = false
+                for i in 0..<months.count {
+                    if i != originalIndex {
+                        months[i].isSelected = false
+                    }
                 }
                 months[originalIndex].isSelected = true
                 cell.selectedCell(textColor: selectedTextColor)
                 compareDays()
                 infiniteScrollingBehaviourForMonths.reload(withData: months)
             } else {
-                for index in 0..<years.count where index != originalIndex {
-                        years[index].isSelected = false
+                for i in 0..<years.count {
+                    if i != originalIndex {
+                        years[i].isSelected = false
+                    }
                 }
                 years[originalIndex].isSelected = true
                 cell.selectedCell(textColor: selectedTextColor)
@@ -252,7 +255,6 @@ extension FPTDatePicker {
     public func yearRange(inBetween start: Int, end: Int) {
         years = ModelDate.getYears(startYear: start, endYear: end)
         infiniteScrollingBehaviourForYears.reload(withData: years)
-        // yearRow.reloadData()
     }
     public func getSelectedDate() -> Date {
         let date = CalendarHelper.getThatDate(days, months, years)
@@ -261,7 +263,7 @@ extension FPTDatePicker {
 }
 
 extension FPTDatePicker {
-    func delay(_ seconds: Double, completion: @escaping () -> Void ) {
+    func delay(_ seconds: Double, completion: @escaping () -> Void) {
         DispatchQueue.main.asyncAfter(deadline: .now() + seconds) {
             completion()
         }
