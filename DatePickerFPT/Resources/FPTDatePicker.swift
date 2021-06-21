@@ -214,19 +214,19 @@ extension FPTDatePicker: InfiniteScrollingBehaviourDelegate {
         if let cell = behaviour.collectionView.cellForItem(at: indexPath) as? DatePickerCollectionViewCell {
             cell.labelDate.font = fontFamily
             if behaviour.collectionView.tag == 0 {
-                for i in 0..<days.count {
-                    if i != originalIndex {
-                        currentDay = days[i].type
-                        days[i].isSelected = false
+                for index in 0..<days.count {
+                    if index != originalIndex {
+                        currentDay = days[index].type
+                        days[index].isSelected = false
                     }
                 }
                 days[originalIndex].isSelected = true
                 compareDays()
                 cell.selectedCell(textColor: selectedTextColor)
             } else if behaviour.collectionView.tag == 1 {
-                for i in 0..<months.count {
-                    if i != originalIndex {
-                        months[i].isSelected = false
+                for index in 0..<months.count {
+                    if index != originalIndex {
+                        months[index].isSelected = false
                     }
                 }
                 months[originalIndex].isSelected = true
@@ -234,9 +234,9 @@ extension FPTDatePicker: InfiniteScrollingBehaviourDelegate {
                 compareDays()
                 infiniteScrollingBehaviourForMonths.reload(withData: months)
             } else {
-                for i in 0..<years.count {
-                    if i != originalIndex {
-                        years[i].isSelected = false
+                for index in 0..<years.count {
+                    if index != originalIndex {
+                        years[index].isSelected = false
                     }
                 }
                 years[originalIndex].isSelected = true
