@@ -7,15 +7,19 @@
 
 import UIKit
 
-public protocol InfiniteScrollingBehaviourDelegate: class {
+public protocol InfiniteScrollingBehaviourDelegate: AnyObject {
     func configuredCell(collectionView: UICollectionView, forItemAtIndexPath indexPath: IndexPath,
                         originalIndex: Int, andData data: InfiniteScollingData,
                         forInfiniteScrollingBehaviour behaviour: InfiniteScrollingBehaviour) -> UICollectionViewCell
+    
     func didSelectItem(collectionView: UICollectionView, atIndexPath indexPath: IndexPath,
                        originalIndex: Int, andData data: InfiniteScollingData,
                        inInfiniteScrollingBehaviour behaviour: InfiniteScrollingBehaviour)
+    
     func didEndScrolling(inInfiniteScrollingBehaviour behaviour: InfiniteScrollingBehaviour)
+    
     func verticalPaddingForHorizontalInfiniteScrollingBehaviour(behaviour: InfiniteScrollingBehaviour) -> CGFloat
+    
     func horizonalPaddingForHorizontalInfiniteScrollingBehaviour(behaviour: InfiniteScrollingBehaviour) -> CGFloat
 }
 
@@ -23,10 +27,13 @@ public extension InfiniteScrollingBehaviourDelegate {
     func didSelectItem(collectionView: UICollectionView, atIndexPath indexPath: IndexPath,
                        originalIndex: Int, andData data: InfiniteScollingData,
                        inInfiniteScrollingBehaviour behaviour: InfiniteScrollingBehaviour) { }
+    
     func didEndScrolling(inInfiniteScrollingBehaviour behaviour: InfiniteScrollingBehaviour) { }
+    
     func verticalPaddingForHorizontalInfiniteScrollingBehaviour(behaviour: InfiniteScrollingBehaviour) -> CGFloat {
         return 0
     }
+    
     func horizonalPaddingForHorizontalInfiniteScrollingBehaviour(behaviour: InfiniteScrollingBehaviour) -> CGFloat {
         return 0
     }

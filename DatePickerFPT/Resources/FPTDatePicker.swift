@@ -47,14 +47,11 @@ open class FPTDatePicker: UIView {
     override open func willMove(toSuperview newSuperview: UIView?) {
         super.willMove(toSuperview: newSuperview)
         days = ModelDate.getDays(years, months)
-        
-        if let _ = infiniteScrollingBehaviourForDays {}
-        else {
-            let configuration = CollectionViewConfiguration(layoutType: .fixedSize(sizeValue: 60, lineSpacing: 10), scrollingDirection: .horizontal)
-            infiniteScrollingBehaviourForMonths = InfiniteScrollingBehaviour(withCollectionView: monthRow, andData: months, delegate: self, configuration: configuration)
-            infiniteScrollingBehaviourForDays = InfiniteScrollingBehaviour(withCollectionView: dateRow, andData: days, delegate: self, configuration: configuration)
-            infiniteScrollingBehaviourForYears = InfiniteScrollingBehaviour(withCollectionView: yearRow, andData: years, delegate: self, configuration: configuration)
-        }
+        // Set up CollectionView DataSource
+        let configuration = CollectionViewConfiguration(layoutType: .fixedSize(sizeValue: 60, lineSpacing: 10), scrollingDirection: .horizontal)
+        infiniteScrollingBehaviourForMonths = InfiniteScrollingBehaviour(withCollectionView: monthRow, andData: months, delegate: self, configuration: configuration)
+        infiniteScrollingBehaviourForDays = InfiniteScrollingBehaviour(withCollectionView: dateRow, andData: days, delegate: self, configuration: configuration)
+        infiniteScrollingBehaviourForYears = InfiniteScrollingBehaviour(withCollectionView: yearRow, andData: years, delegate: self, configuration: configuration)
     }
     private func loadinit() {
         let bundle = Bundle(for: self.classForCoder)
@@ -68,13 +65,14 @@ open class FPTDatePicker: UIView {
             self.calendarView.backgroundColor = self.bgColor
         }
     }
+    // MARK: inittial Date with tuple (mm, dd, yyyy).
     func initialDate(date: Date) {
-        let (mm, dd, yyyy) = date.seprateDateInDDMMYY
+        let (mm, dd, yyyy) = date.seprateDateInDDMMYY // get current Date ("21", "06", "2020")
         let year = years.firstIndex { (modelObj) -> Bool in
-            return modelObj.type == yyyy
+            return modelObj.type == yyyy // return "2021"
         }
         let day = days.firstIndex { (modelObj) -> Bool in
-            return Int(modelObj.type) == Int(dd)
+            return Int(modelObj.type) == Int(dd) // return "21"
         }
         guard let day = day else {
             return
@@ -82,34 +80,35 @@ open class FPTDatePicker: UIView {
         guard let year = year else {
             return
         }
-        let month = Int(mm)! - 1
+        let month = Int(mm)! - 1 // month = mm(06) - 1 = 5 . Because index run from 0
         years[year].isSelected = true
         months[month].isSelected = true
         days[day].isSelected = true
-        collectionState(infiniteScrollingBehaviourForYears, year)
-        collectionState(infiniteScrollingBehaviourForMonths, month)
-        collectionState(infiniteScrollingBehaviourForDays, day)
+        collectionState(infiniteScrollingBehaviourForYears, year) // scroll to year have isSelected = to true
+        collectionState(infiniteScrollingBehaviourForMonths, month) // scroll to month have isSelected = to true
+        collectionState(infiniteScrollingBehaviourForDays, day) // scroll to year day isSelected = to true
     }
     private func collectionState(_ collectionView: InfiniteScrollingBehaviour, _ index: Int) {
         let indexPathForFirstRow = IndexPath(row: index, section: 0)
         switch collectionView.collectionView.tag {
-        case 0:
-            self.days[indexPathForFirstRow.row].isSelected = true
+        case 0: // colectionView.tag = 0
+            self.days[indexPathForFirstRow.row].isSelected = true // set day[indexpath].isSelected = true
             infiniteScrollingBehaviourForDays.reload(withData: days)
             break
         case 1:
-            self.months[indexPathForFirstRow.row].isSelected = true
+            self.months[indexPathForFirstRow.row].isSelected = true // set month[indexpath].isSelected = true
             infiniteScrollingBehaviourForMonths.reload(withData: months)
             break
         case 2:
-            self.years[indexPathForFirstRow.row].isSelected = true
+            self.years[indexPathForFirstRow.row].isSelected = true // set years[indexpath].isSelected = true
             infiniteScrollingBehaviourForYears.reload(withData: years)
             break
         default:
             break
         }
-        collectionView.scroll(toElementAtIndex: index)
+        collectionView.scroll(toElementAtIndex: index) // scroll to position index
     }
+    // MARK: Register for cell.
     private func registerCell() {
         let bundle = Bundle(for: self.classForCoder)
         let nibName = UINib(nibName: "DatePickerCollectionViewCell", bundle: bundle)
@@ -120,6 +119,7 @@ open class FPTDatePicker: UIView {
 }
 
 extension FPTDatePicker: UICollectionViewDelegate {
+    // MARK: When end scrolling.
     public func didEndScrolling(inInfiniteScrollingBehaviour behaviour: InfiniteScrollingBehaviour) {
         selectMiddleRow(collectionView: behaviour.collectionView, data: behaviour.dataSetWithBoundary as! [ModelDate])
         switch behaviour.collectionView.tag {
@@ -252,6 +252,7 @@ extension FPTDatePicker: InfiniteScrollingBehaviourDelegate {
 }
 
 extension FPTDatePicker {
+    // MARK: Pass start year & end year.
     public func yearRange(inBetween start: Int, end: Int) {
         years = ModelDate.getYears(startYear: start, endYear: end)
         infiniteScrollingBehaviourForYears.reload(withData: years)
