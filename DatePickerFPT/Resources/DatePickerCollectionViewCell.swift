@@ -8,8 +8,15 @@
 import UIKit
 
 class DatePickerCollectionViewCell: UICollectionViewCell {
+<<<<<<< HEAD
     //
     //
+=======
+    ///////
+    ///dsds
+    ///dsdsds/
+    //dsadas
+>>>>>>> Test2
     @IBOutlet weak var labelDate: UILabel!
     override func awakeFromNib() {
         super.awakeFromNib()
